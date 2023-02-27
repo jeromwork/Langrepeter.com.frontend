@@ -239,9 +239,9 @@
       </Column>
     </DataTable>
 
+    <Button icon="pi pi-play" class="p-button-rounded p-button-help p-button-text" />
 
 
-    <control-panel></control-panel>
   </div>
 </template>
 
@@ -251,6 +251,9 @@
   import ProductService from '@/service/ProductService';
   import { ref, onBeforeMount } from 'vue';
   import { useLayout } from '@/layout/composables/layout';
+
+  import {Options} from "vue-class-component";
+
 
   const { contextPath } = useLayout();
 
