@@ -1,5 +1,7 @@
 <template>
-    <div class="semi-transparent-strip"> Control Panel</div>
+    <div class="semi-transparent-strip">
+        <slot></slot>
+    </div>
 </template>
 
 <script>

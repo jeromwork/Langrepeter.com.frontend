@@ -12,7 +12,10 @@
     </div>
 
 
-    <control-panel></control-panel>
+    <control-panel>
+      <play-control-block>
+      </play-control-block>
+    </control-panel>
 
   </div>
 
@@ -22,9 +25,12 @@
 import { Options, Vue } from 'vue-class-component';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
+import PlayControlBlock  from '@/components/PlayControlBlock/index.vue';
+
 @Options({
   components: {
     HelloWorld,
+    PlayControlBlock
   },
 })
 export default class HomeView extends Vue {}
