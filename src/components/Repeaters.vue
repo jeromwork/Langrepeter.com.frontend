@@ -1,15 +1,16 @@
 
 
 <script setup lang="ts" >
+/* eslint no-use-before-define: 0 */  // --> OFF
   import type {Ref} from 'vue'
   import {defineComponent, onMounted, ref, reactive, toRefs, defineExpose} from "vue";
   import {Directory, Filesystem, FileInfo} from "@capacitor/filesystem";
   import {VoiceRecorder} from "capacitor-voice-recorder";
   import {RecordingData} from "capacitor-voice-recorder/dist/esm/definitions";
-  import _ from "lodash"
   import axios from 'axios';
   const recording : Ref<boolean> =  ref(false);
   const playing : Ref<boolean> =  ref(false);
+  const autoplay : Ref<boolean> =  ref(true);
   let storedFileNames :FileInfo[] = reactive([])
   const fileName : Ref<string> =  ref('');
   const consoleStr : Ref<string> =  ref('');
@@ -19,12 +20,20 @@
   const words : Ref<string> =  ref('');
   const lang : Ref<string> =  ref('eng');
   const player = ref<InstanceType<typeof HTMLVideoElement>>();
+  const auto = ref<InstanceType<typeof HTMLVideoElement>>();
 
+
+  /**
+   * из json получаем масси объектов
+   * из него генерим объекты к примеру Audio
+   * Получаем сообщения от Audio и переключаем
+   */
+
+  //const audio = ref(new Audio('https://file-examples.com/wp-content/storage/2017/11/file_example_MP3_700KB.mp3')); // path to file
 
   onMounted(async () =>{
     console.log('onMounted')
-    // const audio = new Audio('https://file-examples.com/wp-content/storage/2017/11/file_example_MP3_700KB.mp3'); // path to file
-    // await audio.play();
+
     // await VoiceRecorder.requestAudioRecordingPermission()
   });
 
@@ -52,13 +61,61 @@
   //
   // }
 
-  const play = () => {
-    if(player.value){
-      player.value.play();
+const audioFiles = [
+    'https://audio-samples.github.io/samples/mp3/music/sample-0.mp3',
+    'https://audio-samples.github.io/samples/mp3/music_primed/sample-3.mp3',
+    'https://audio-samples.github.io/samples/mp3/music_primed/sample-4.mp3',
+];
+
+const audios = ref([]);
+
+const playAudio = (audioIndex) => {
+    console.log(audioIndex)
+    console.log(audios.value)
+    console.log(audios.value[audioIndex])
+    if (audios.value[audioIndex]) {
+        audios.value[audioIndex].play();
+        audios.value[audioIndex].addEventListener('ended', () => {
+            if(audios.value[audioIndex+1])
+                playAudio(audioIndex+1);
+            console.log(`Audio ${audioIndex} finished playing`);
+            // Perform actions or trigger next audio here
+        });
     }
 
-    setPlaying(true);
-  }
+
+
+};
+
+
+onMounted(() => {
+    audioFiles.forEach((audioFile, index) => {
+        const audio = new Audio(audioFile);
+        audio.autoplay = true;
+
+        audio.addEventListener('error', (event) => {
+            console.error('Error loading audio:', event.target.error);
+        });
+        audios.value.push(audio);
+       // playAudio(index); // Autoplay each audio file
+    });
+});
+
+// Optionally, you can also add event listeners to the audio element
+
+  // const play = () => {
+  //
+  //     console.log('sdkfjwjf')
+  //
+  //
+  //
+  //      audio.play();
+  //   if(player.value){
+  //     player.value.play();
+  //   }
+  //
+  //   setPlaying(true);
+  // }
   const setPlaying = (  state :boolean ) => {
     playing.value = state;
   }
@@ -69,49 +126,44 @@
   });
 
 
-  toRefs({
-    recording,
-    playing,
-    storedFileNames,
-    fileName,
-    consoleStr,
-    meaningStr,
-    meaningEng,
-    src,
-    words,
-    lang,
-    player,
-  });
+
 </script>
 
 
 <template>
   <div>
+<div ></div>
 
 
-    <div class="audioWrapper">
+    <div class="audioWrapper" ref="auto" @click="play">
       <h3>get audio</h3>
     </div>
 
-    <video
-            :src="src"
-            :muted="muted"
-            :autoplay="autoplay"
-            :controls="controls"
-            :loop="loop"
-            :width="width"
-            :height="height"
-            :poster="poster"
-            :preload="preload"
-            :playsinline="true"
-            ref="player"
-    />
+<!--    <video-->
+<!--            :src="src"-->
+<!--            :muted="false"-->
+<!--            :autoplay="autoplay"-->
+<!--            :controls="true"-->
+<!--            :loop="loop"-->
+<!--            :width="width"-->
+<!--            :height="height"-->
+<!--            :poster="poster"-->
+<!--            :preload="true"-->
+<!--            :playsinline="true"-->
+<!--            ref="player"-->
+<!--    />-->
 
 
     <input type="text" v-model="words" placeholder="enter words by ;">
 
 
     <button @click="getEcho">getEcho</button>
+
+
+      <div>
+          <button @click="playAudio(0)">Play</button>
+      </div>
+
 
   </div>
 </template>
