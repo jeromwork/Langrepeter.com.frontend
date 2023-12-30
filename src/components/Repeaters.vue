@@ -73,9 +73,10 @@ const playAudio = (audioIndex) => {
     console.log(audioIndex)
     console.log(audios.value)
     console.log(audios.value[audioIndex])
-    if (audios.value[audioIndex]) {
-        audios.value[audioIndex].play();
-        audios.value[audioIndex].addEventListener('ended', () => {
+    const audioElement = audios.value[audioIndex];
+    if (audioElement && audioElement as HTMLAudioElement ) {
+        audioElement.play();
+        audioElement.addEventListener('ended', () => {
             if(audios.value[audioIndex+1])
                 playAudio(audioIndex+1);
             console.log(`Audio ${audioIndex} finished playing`);
